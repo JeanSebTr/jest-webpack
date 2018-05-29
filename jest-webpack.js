@@ -20,10 +20,18 @@ function run(argv, webpackConfig) {
   }
 
   if (!webpackConfig) {
+    var tryRequire = require('./src/try-require');
     var webpackYargs = require('yargs/yargs')([]);
-    require('webpack/bin/config-yargs')(webpackYargs);
+    tryRequire(
+      () => require('webpack/bin/config-yargs'),
+      () => require('webpack-cli/bin/config-yargs')
+    )(webpackYargs);
+    
     var webpackArgv = webpackYargs.parse(webpackArgvPortion);
-    webpackConfig = require('webpack/bin/convert-argv')(
+    webpackConfig = tryRequire(
+      () => require('webpack/bin/convert-argv'),
+      () => require('webpack-cli/bin/convert-argv')
+    )(
       webpackYargs, webpackArgv
     );
   }
